@@ -2,14 +2,14 @@
 let aubrey: Sprite
 let enemies: Sprite[] = []
 let bombs: Sprite[] = []
-let speed = 100
+let speed = 80
 let score = 0
 let level = 1
 
 // Initialize game
 function initGame() {
-    // Set up screen
-    scene.setBackgroundColor(1)
+    // Load the tilemap from your project
+    tiles.setTilemap(tilemap`level`)
     
     // Create Aubrey (player character)
     aubrey = sprites.create(img`
@@ -31,24 +31,14 @@ function initGame() {
         . . . . . . . . . . . . . . . .
     `, SpriteKind.Player)
     
-    aubrey.setPosition(75, 75)
+    aubrey.setPosition(40, 40)
     aubrey.setFlag(SpriteFlag.StayInScreen, true)
-    
-    // Create obstacles (walls)
-    createWalls()
     
     // Create initial enemies
     createEnemies(level)
     
     // Update score display
     info.setScore(0)
-    
-    // Game loop for controls
-    game.onUpdate(function() {
-        handleControls()
-        checkCollisions()
-        info.setScore(score)
-    })
 }
 
 // Handle player movement
@@ -75,35 +65,6 @@ function handleControls() {
     }
 }
 
-// Create wall obstacles
-function createWalls() {
-    // Create a simple maze pattern with wall tiles
-    for (let x = 2; x < 16; x += 2) {
-        for (let y = 2; y < 12; y += 2) {
-            let wall = sprites.create(img`
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-                f f f f f f f f f f f f f f f f
-            `, SpriteKind.Food)
-            wall.setPosition(x * 8 + 4, y * 8 + 4)
-            wall.setFlag(SpriteFlag.Ghost, false)
-        }
-    }
-}
-
 // Create enemies
 function createEnemies(count: number) {
     for (let i = 0; i < count; i++) {
@@ -126,8 +87,8 @@ function createEnemies(count: number) {
             . . . . . . . . . . . . . . . .
         `, SpriteKind.Enemy)
         
-        enemy.setPosition(128 - (i + 1) * 25, 32)
-        enemy.setVelocity(randint(-speed / 2, speed / 2), randint(-speed / 2, speed / 2))
+        enemy.setPosition(100 + i * 30, 60)
+        enemy.setVelocity(randint(-speed / 3, speed / 3), randint(-speed / 3, speed / 3))
         enemies.push(enemy)
     }
 }
@@ -165,8 +126,6 @@ function placeBomb() {
     
     let bombX = bomb.x
     let bombY = bomb.y
-    
-    // Explode bomb after 1 second using a timer
     let timeLeft = 30
     bombTimers.push(timeLeft)
     
@@ -204,7 +163,7 @@ function explodeBomb(x: number, y: number) {
     
     // Check for enemy hits
     for (let enemy of enemies) {
-        if (Math.abs(enemy.x - x) < 15 && Math.abs(enemy.y - y) < 15) {
+        if (Math.abs(enemy.x - x) < 20 && Math.abs(enemy.y - y) < 20) {
             sprites.destroy(enemy)
             score += 10
         }
@@ -224,8 +183,12 @@ function checkCollisions() {
     }
 }
 
-// Decrease bomb cooldown
+// Main game loop
 game.onUpdate(function() {
+    handleControls()
+    checkCollisions()
+    info.setScore(score)
+    
     if (bombCooldown > 0) {
         bombCooldown += -1
     }
