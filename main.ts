@@ -132,6 +132,9 @@ function createEnemies(count: number) {
     }
 }
 
+// Track bomb timers
+let bombTimers: number[] = []
+
 // Place a bomb
 let bombCooldown = 0
 function placeBomb() {
@@ -160,11 +163,19 @@ function placeBomb() {
     bombs.push(bomb)
     bombCooldown = 30
     
-    // Explode bomb after 1 second
-    control.inBackground(function() {
-        pause(1000)
-        sprites.destroy(bomb)
-        explodeBomb(bomb.x, bomb.y)
+    let bombX = bomb.x
+    let bombY = bomb.y
+    
+    // Explode bomb after 1 second using a timer
+    let timeLeft = 30
+    bombTimers.push(timeLeft)
+    
+    game.onUpdate(function() {
+        timeLeft += -1
+        if (timeLeft <= 0) {
+            sprites.destroy(bomb)
+            explodeBomb(bombX, bombY)
+        }
     })
 }
 
@@ -199,6 +210,8 @@ function explodeBomb(x: number, y: number) {
         }
     }
     
+    // Remove explosion after 200ms
+    pause(200)
     sprites.destroy(explosion)
 }
 
@@ -210,6 +223,13 @@ function checkCollisions() {
         }
     }
 }
+
+// Decrease bomb cooldown
+game.onUpdate(function() {
+    if (bombCooldown > 0) {
+        bombCooldown += -1
+    }
+})
 
 // Start the game
 initGame()
