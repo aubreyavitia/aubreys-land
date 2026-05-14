@@ -31,14 +31,26 @@ let character = sprites.create(myImage);
 character.setPosition(80, 60);
 character.setFlag(SpriteFlag.StayInScreen, true);
 
+// Track character health
+let health = 3;
+
 // Set the tilemap as the background
 tiles.setTilemap(level);
 
 // Camera follows the character
-camera.followSprite(character);
+scene.cameraFollowSprite(character);
 
-// Game loop for free roam movement
+// Handle character death
 game.onUpdate(function () {
+    // Check if character is dead
+    if (health <= 0) {
+        music.playTone(200, music.beat(BeatFraction.Half));
+        music.playTone(150, music.beat(BeatFraction.Half));
+        music.playTone(100, music.beat(BeatFraction.Whole));
+        game.showLongText("Game Over! You died!", DialogLayout.Center);
+        game.reset();
+    }
+
     // Handle character movement with arrow keys
     if (controller.left.isPressed()) {
         character.vx = -60;
