@@ -158,14 +158,14 @@ function endGameWin() {
     score = score + 1000
     updateHUD()
     game.showLongText("YOU WIN! Made it to Roma!", DialogLayout.Bottom)
-    game.over(GAME_OVER_WIN)
+    game.over(true)
 }
 
 function endGameLose(reason: string) {
     gameRunning = false
     playDeathSound()
     game.showLongText(reason, DialogLayout.Bottom)
-    game.over(GAME_OVER_LOSE)
+    game.over(false)
 }
 
 // Collision detection
